@@ -51,6 +51,7 @@ public class ListBeaconsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		changeColor(Color.YELLOW);
+		DemosApplication.setCurrentActivity(this);
 		DemosApplication.setBeaconsList(this);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 

@@ -1,6 +1,10 @@
 package com.estimote.examples.demos;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,18 +15,13 @@ import android.widget.TextView;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.Utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-
 /**
  * Displays basic information about beacon.
  *
  * @author wiktor@estimote.com (Wiktor Gworek)
  */
 public class LeDeviceListAdapter extends BaseAdapter {
-	private ListBeaconsActivity instance = null;
+	private ListBeaconsActivity instance = null; // activity changing layout
 	private ArrayList<Beacon> beacons;
 	private LayoutInflater inflater;
 
@@ -65,36 +64,77 @@ public class LeDeviceListAdapter extends BaseAdapter {
 		// holder.macTextView.setText(String.format("MAC: %s (%.2fm)",
 		// beacon.getMacAddress(), Utils.computeAccuracy(beacon)));
 		if (instance != null) {
-			if (beacon.getMacAddress().equals(MyBeaconDetector.cyan_MAC)) {
+			if (beacon.getMacAddress().equals(MyBeacons.cyan_MAC)) {
 				holder.macTextView.setText("Widzê b³êkitnego, jest "
 						+ String.format("%.2fm st¹d.",
 								Utils.computeAccuracy(beacon)));
 
-				if (Utils.computeAccuracy(beacon) > 5.0)
+				if (Utils.computeAccuracy(beacon) < 4.0) {
 					instance.changeColor(Color.CYAN);
-				else
+					DemosApplication.setCurrentBeaconName(MyBeacons.cyan_name);
+					if (MyBeacons.flag4Cyan) {
+						MyBeacons.flag4Cyan = false;
+						new PostDataAsyncTask().execute();
+					}
+				} else if(Utils.computeAccuracy(beacon) > 4.0){
+					MyBeacons.flag4Cyan = true;
 					instance.changeColor(Color.YELLOW);
-
-			} else if (beacon.getMacAddress().equals(MyBeaconDetector.blue_MAC)) {
+				}
+			} else if (beacon.getMacAddress().equals(MyBeacons.blue_MAC)) {
 				holder.macTextView.setText("Widzê kobaltowego, jest "
 						+ String.format("%.2fm st¹d.",
 								Utils.computeAccuracy(beacon)));
-				
-				if (Utils.computeAccuracy(beacon) > 5.0)
+
+				if (Utils.computeAccuracy(beacon) < 4.0) {
 					instance.changeColor(Color.BLUE);
-				else
+					DemosApplication.setCurrentBeaconName(MyBeacons.blue_name);
+					if (MyBeacons.flag4Blue) {
+						MyBeacons.flag4Blue = false;
+						new PostDataAsyncTask().execute();
+					}
+					
+					// if(MyBeacons.attmepts4Blue == MyBeacons.maxAttmepts)
+					// new PostDataAsyncTask().execute();
+					// else if(MyBeacons.attmepts4Blue==0)
+					// MyBeacons.attmepts4Blue = MyBeacons.maxAttmepts;
+					// else
+					// MyBeacons.attmepts4Blue--;
+
+					// if (!startedStreaming) {
+					// startedStreaming = true;
+					// Intent inent = new Intent(
+					// "net.majorkernelpanic.spydroid.ui.ANOTHER_ACTIVITY");
+					// DemosApplication.getCurrentActivity().startActivity(inent);
+					// }
+
+				} else if(Utils.computeAccuracy(beacon) > 4.0){
+					MyBeacons.flag4Blue = false;
 					instance.changeColor(Color.YELLOW);
-			
-			} else if (beacon.getMacAddress()
-					.equals(MyBeaconDetector.green_MAC)) {
+				}
+			} else if (beacon.getMacAddress().equals(MyBeacons.green_MAC)) {
 				holder.macTextView.setText("Widzê zielonego, jest "
 						+ String.format("%.2fm st¹d.",
 								Utils.computeAccuracy(beacon)));
-				
-				if (Utils.computeAccuracy(beacon) > 5.0)
+
+				if (Utils.computeAccuracy(beacon) < 4.0) {
 					instance.changeColor(Color.GREEN);
-				else
+					DemosApplication.setCurrentBeaconName(MyBeacons.green_name);
+					if (MyBeacons.flag4Green) {
+						MyBeacons.flag4Green = false;
+						new PostDataAsyncTask().execute();
+					}
+
+					// if(MyBeacons.attmepts4Green == MyBeacons.maxAttmepts)
+					// new PostDataAsyncTask().execute();
+					// else if(MyBeacons.attmepts4Green==0)
+					// MyBeacons.attmepts4Green = MyBeacons.maxAttmepts;
+					// else
+					// MyBeacons.attmepts4Green--;
+					//
+				}else if(Utils.computeAccuracy(beacon) > 4.0){
+					MyBeacons.flag4Green = true;
 					instance.changeColor(Color.YELLOW);
+				}
 			} else {
 				holder.macTextView.setText("Inny Beacon");
 			}

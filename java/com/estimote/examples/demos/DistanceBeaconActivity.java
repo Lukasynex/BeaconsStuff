@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
+
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
@@ -41,6 +42,7 @@ public class DistanceBeaconActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+	DemosApplication.setCurrentActivity(this);
 
     getActionBar().setDisplayHomeAsUpEnabled(true);
     setContentView(R.layout.distance_view);

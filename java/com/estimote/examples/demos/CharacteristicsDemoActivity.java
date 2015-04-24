@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.cloud.model.BeaconInfo;
 import com.estimote.sdk.connection.BeaconConnection;
@@ -31,6 +32,8 @@ public class CharacteristicsDemoActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.characteristics_demo);
+	DemosApplication.setCurrentActivity(this);
+
     getActionBar().setDisplayHomeAsUpEnabled(true);
 
     statusView = (TextView) findViewById(R.id.status);

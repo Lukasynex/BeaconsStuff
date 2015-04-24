@@ -17,6 +17,7 @@ public class AllDemosActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.all_demos);
+	DemosApplication.setCurrentActivity(this);
 
     findViewById(R.id.distance_demo_button).setOnClickListener(new View.OnClickListener() {
       @Override

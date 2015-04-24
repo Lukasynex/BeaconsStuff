@@ -1,154 +1,122 @@
 package com.estimote.examples.demos;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.app.Activity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-public class PostDataAsyncTask extends AsyncTask<String, String, String> {
-	private static final String TAG = "Dywuzjon303";
-	protected void onPreExecute() {
-		super.onPreExecute();
-		// do stuff before posting data
-	}
+public class PostDataAsyncTask extends AsyncTask<String, Void, String> {
+	private static String[] notifications = { " jest w domu",
+			" jest blisko", " w³aœnie wszed³ do domu" };
+	private static int i = 0;
+	private final ProgressDialog dialog = ProgressDialog.show(
+			DemosApplication.getCurrentActivity(), "",
+			"Wysy³anie informacji...", true);
 
 	@Override
-	protected String doInBackground(String... strings) {
+	protected String doInBackground(String... params) {
+		// perform long running operation operation
+
+		// SharedPreferences settings = context.getSharedPreferences(PREFS_FILE,
+		// 0);
+		// String server = settings.getString("server", "");
+		String server = "http://student.agh.edu.pl/~kryciak/android.php";
+
+		HttpClient httpclient = new DefaultHttpClient();
+		HttpPost httppost = new HttpPost(server);
+
 		try {
+			// Add your data
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+			String date = Calendar.getInstance().getTime().toString();
+			nameValuePairs.add(new BasicNameValuePair("android",
+					DemosApplication.getCurrentBeaconName()
+							+ notifications[(++i) % 3] + " [" + date + "]"));
+			httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-			// 1 = post text data, 2 = post file
-			int actionChoice = 1;
-
-			// post a text data
-			if (actionChoice == 1) {
-				postText();
+			try {
+				httpclient.execute(httppost);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			}
 
-			// post a file
-			else {
-				postFile();
-			}
+			// Execute HTTP Post Request
+			// ResponseHandler<String> responseHandler=new
+			// BasicResponseHandler();
+			// String responseBody = httpclient.execute(httppost,
+			// responseHandler);
 
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			// if (Boolean.parseBoolean(responseBody)) {
+			// dialog.cancel();
+			// }
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			Log.i("HTTP Failed", e.toString());
 		}
+
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	 */
 	@Override
-	protected void onPostExecute(String lenghtOfFile) {
-		// do stuff after posting data
+	protected void onPostExecute(String result) {
+		// execution of result of Long time consuming operation
+		dialog.dismiss();
+
+		Toast toast = Toast.makeText(DemosApplication.getCurrentActivity(),
+				"Wys³ano.", 1000);
+		toast.show();
+
 	}
 
-	// this will post our text data
-	private void postText() {
-		try {
-			// url where the data will be posted
-			String postReceiverUrl = "http://yourdomain.com/post_data_receiver.php";
-			Log.v(TAG, "postURL: " + postReceiverUrl);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.os.AsyncTask#onPreExecute()
+	 */
+	@Override
+	protected void onPreExecute() {
+		// Things to be done before execution of long running operation. For
+		// example showing ProgessDialog
 
-			// HttpClient
-			HttpClient httpClient = new DefaultHttpClient();
-
-			// post header
-			HttpPost httpPost = new HttpPost(postReceiverUrl);
-
-			// add your data
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-			nameValuePairs.add(new BasicNameValuePair("firstname", "Mike"));
-			nameValuePairs.add(new BasicNameValuePair("lastname", "Dalisay"));
-			nameValuePairs.add(new BasicNameValuePair("email",
-					"mike@testmail.com"));
-
-			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-			// execute HTTP post request
-			HttpResponse response = httpClient.execute(httpPost);
-			HttpEntity resEntity = response.getEntity();
-
-			if (resEntity != null) {
-
-				String responseStr = EntityUtils.toString(resEntity).trim();
-				Log.v(TAG, "Response: " + responseStr);
-
-				// you can add an if statement here and do other actions based
-				// on the response
-			}
-
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		dialog.setCancelable(false);
+		dialog.show();
 	}
 
-	// will post our text file
-	private void postFile() {
-		try {
-
-			// the file to be posted
-			String textFile = Environment.getExternalStorageDirectory()
-					+ "/sample.txt";
-			Log.v(TAG, "textFile: " + textFile);
-
-			// the URL where the file will be posted
-			String postReceiverUrl = "http://yourdomain.com/post_data_receiver.php";
-			Log.v(TAG, "postURL: " + postReceiverUrl);
-
-			// new HttpClient
-			HttpClient httpClient = new DefaultHttpClient();
-
-			// post header
-			HttpPost httpPost = new HttpPost(postReceiverUrl);
-
-			File file = new File(textFile);
-			FileBody fileBody = new FileBody(file);
-
-			MultipartEntity reqEntity = new MultipartEntity(
-					HttpMultipartMode.BROWSER_COMPATIBLE);
-			reqEntity.addPart("file", fileBody);
-			httpPost.setEntity(reqEntity);
-
-			// execute HTTP post request
-			HttpResponse response = httpClient.execute(httpPost);
-			HttpEntity resEntity = response.getEntity();
-
-			if (resEntity != null) {
-
-				String responseStr = EntityUtils.toString(resEntity).trim();
-				Log.v(TAG, "Response: " + responseStr);
-
-				// you can add an if statement here and do other actions based
-				// on the response
-			}
-
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.os.AsyncTask#onProgressUpdate(Progress[])
+	 */
+	@Override
+	protected void onProgressUpdate(Void... values) {
+		// Things to be done while execution of long running operation is in
+		// progress. For example updating ProgessDialog
 
 	}
 }
