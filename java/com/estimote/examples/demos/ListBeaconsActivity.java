@@ -13,8 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -50,6 +50,7 @@ public class ListBeaconsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		// getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		changeColor(Color.YELLOW);
 		DemosApplication.setCurrentActivity(this);
 		DemosApplication.setBeaconsList(this);
@@ -193,5 +194,4 @@ public class ListBeaconsActivity extends Activity {
 			}
 		};
 	}
-
 }
